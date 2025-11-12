@@ -1,46 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sylvarian Currency Tracker</title>
+  <title>Sylvaria Currency Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Sylvaria Currency Exchange</h1>
+  <h1>Sylvaria Currency Exchange Tracker</h1>
 
-  <!-- Input for new exchange rate -->
-  <label>SYL to USD:</label>
-  <input type="number" id="rateInput" step="0.01">
-  <button onclick="addRate()">Add Rate</button>
+  <!-- Inputs -->
+  <label>Currency Supply (SYL):</label>
+  <input type="number" id="supply"><br>
+
+  <label>Total Goods Value (USD):</label>
+  <input type="number" id="goods"><br>
+
+  <button onclick="calculateRate()">Calculate Rate</button>
 
   <!-- Graph -->
   <canvas id="currencyChart" width="400" height="200"></canvas>
 
   <script>
-    // Load saved data or start fresh
+    // Load saved data
     let rates = JSON.parse(localStorage.getItem("sylRates")) || [];
 
-    // Chart setup
     const ctx = document.getElementById('currencyChart').getContext('2d');
     const chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: rates.map((_, i) => "Day " + (i+1)),
+        labels: rates.map((_, i) => "Entry " + (i+1)),
         datasets: [{
           label: 'SYL to USD',
           data: rates,
-          borderColor: 'blue',
+          borderColor: 'green',
           fill: false
         }]
       }
     });
 
-    // Add new rate
-    function addRate() {
-      const rate = parseFloat(document.getElementById("rateInput").value);
-      if (!isNaN(rate)) {
+    function calculateRate() {
+      const supply = parseFloat(document.getElementById("supply").value);
+      const goods = parseFloat(document.getElementById("goods").value);
+
+      if (!isNaN(supply) && !isNaN(goods) && supply > 0) {
+        const rate = goods / supply; // formula
         rates.push(rate);
         localStorage.setItem("sylRates", JSON.stringify(rates));
-        chart.data.labels.push("Day " + rates.length);
+        chart.data.labels.push("Entry " + rates.length);
         chart.data.datasets[0].data.push(rate);
         chart.update();
       }
